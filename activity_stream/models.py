@@ -16,6 +16,24 @@ from django.contrib.auth.models import User
 from photologue.models import ImageModel
 
 
+
+class SerializedDataField(models.TextField):
+    """Because Django for some reason feels its needed to repeatedly call
+    to_python even after it's been converted this does not support strings."""
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        if value is None: return
+        if not isinstance(value, basestring): return value
+        value = pickle.loads(base64.b64decode(value))
+        return value
+
+    def get_db_prep_save(self, value):
+        if value is None: return
+        return base64.b64encode(pickle.dumps(value))
+
+
+
 class ActivityFollower(models.Model):
     to_user  = models.ForeignKey(User, related_name="followed")
     from_user  = models.ForeignKey(User, related_name="following")
@@ -113,23 +131,6 @@ class ActivityStreamItemSubject(models.Model):
     def __unicode__(self):
         return "%s %s"%(self.content_type, self.object_id)
 
-
-
-
-class SerializedDataField(models.TextField):
-    """Because Django for some reason feels its needed to repeatedly call
-    to_python even after it's been converted this does not support strings."""
-    __metaclass__ = models.SubfieldBase
-
-    def to_python(self, value):
-        if value is None: return
-        if not isinstance(value, basestring): return value
-        value = pickle.loads(base64.b64decode(value))
-        return value
-
-    def get_db_prep_save(self, value):
-        if value is None: return
-        return base64.b64encode(pickle.dumps(value))
 
 
 
