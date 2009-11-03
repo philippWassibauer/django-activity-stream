@@ -1,0 +1,6 @@
+{% load avatar_tags %}
+{% for bein_followed in following %}
+    <a href="{{bein_followed.from_user.get_absolute_url}}" class="profile-signature-image">
+        <img src="{% avatar_url bein_followed.from_user 24 %}" alt="{{ bein_followed.from_user }}" height="24px" width="24px"/>
+    </a>
+{% endfor %}

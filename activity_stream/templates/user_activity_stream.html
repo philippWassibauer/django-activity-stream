@@ -1,0 +1,11 @@
+{% if activity_items %}
+    <ul class="activity-stream">
+        {% for activity_item in activity_items %}
+            <li>
+                {{activity_item.render}} 
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+        <b>No activity</b>
+{% endif %}
