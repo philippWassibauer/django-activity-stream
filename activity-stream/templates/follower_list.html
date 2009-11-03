@@ -1,6 +1,0 @@
-{% load avatar_tags %}
-{% for follower in followed %}
-    <a href="{{follower.to_user.get_absolute_url}}" class="profile-signature-image">
-        <img src="{% avatar_url follower.to_user 24 %}" alt="{{ follower.to_user.get_profile }}" height="24px" width="24px"/>
-    </a>
-{% endfor %}
