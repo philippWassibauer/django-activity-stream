@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from django.contrib.gis.db import models
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
@@ -14,8 +12,7 @@ from django.contrib.contenttypes import generic
 
 from django.contrib.auth.models import User
 from photologue.models import ImageModel
-from geo.utils import reverse_geocode
-from geo.models import SerializedDataField
+
 
 class ActivityFollower(models.Model):
     to_user  = models.ForeignKey(User, related_name="followed")
@@ -74,7 +71,6 @@ class ActivityStreamItem(models.Model):
 
     is_batched = models.BooleanField(default=False)
     
-    objects = models.GeoManager()
 
     def first_subject(self):
         return self.subjects.all()[0]
@@ -106,11 +102,6 @@ class ActivityStreamItem(models.Model):
         else:
             return ""
 
-    def save(self, force_insert=False, force_update=False):
-        if not self.location_name and self.location:
-            self.location_name = reverse_geocode(self.location)
-        super(ActivityStreamItem, self).save(force_insert, force_update)
-
 
 class ActivityStreamItemSubject(models.Model):
     content_type = models.ForeignKey(ContentType)
@@ -119,4 +110,25 @@ class ActivityStreamItemSubject(models.Model):
     activity_stream_item = models.ForeignKey(ActivityStreamItem, related_name="subjects")
     def __unicode__(self):
         return "%s %s"%(self.content_type, self.object_id)
+
+
+
+
+class SerializedDataField(models.TextField):
+    """Because Django for some reason feels its needed to repeatedly call
+    to_python even after it's been converted this does not support strings."""
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        if value is None: return
+        if not isinstance(value, basestring): return value
+        value = pickle.loads(base64.b64decode(value))
+        return value
+
+    def get_db_prep_save(self, value):
+        if value is None: return
+        return base64.b64encode(pickle.dumps(value))
+
+
+
 
