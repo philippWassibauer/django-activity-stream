@@ -15,7 +15,12 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from photologue.models import ImageModel
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
+import base64
 
 class SerializedDataField(models.TextField):
     """Because Django for some reason feels its needed to repeatedly call
@@ -32,8 +37,7 @@ class SerializedDataField(models.TextField):
         if value is None: return
         return base64.b64encode(pickle.dumps(value))
 
-
-
+    
 class ActivityFollower(models.Model):
     to_user  = models.ForeignKey(User, related_name="followed")
     from_user  = models.ForeignKey(User, related_name="following")
@@ -51,23 +55,6 @@ class ActivityTypes(models.Model):
     is_batchable = models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
-
-def create_activity_item(type, user, subject, data=None, safetylevel=1):
-    type = ActivityTypes.objects.get(name=type)
-    if type.is_batchable:
-        # see if one exists in timeframe
-        batchable_items = ActivityStreamItem.objects.filter(actor=user, type=type).all()
-        if batchable_items: # if no batchable items then just create a ActivityStreamItem below
-            batchable_items[0].subjects.create(content_object=subject)
-            batchable_items[0].is_batched = True
-            batchable_items[0].save()
-            return batchable_items[0]
-
-    new_item = ActivityStreamItem.objects.create(actor=user, type=type, data=data, safetylevel=safetylevel)
-    new_item.subjects.create(content_object=subject)
-    new_item.save()
-    
-    return new_item
 
 
 class ActivityStreamItem(models.Model):
@@ -128,6 +115,32 @@ class ActivityStreamItemSubject(models.Model):
         return "%s %s"%(self.content_type, self.object_id)
 
 
+def get_people_i_follow(user, count=None):
+    if settings.ACTIVITY_GET_PEOPLE_I_FOLLOW:
+        return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
+    else:
+        return ActivityFollower.objects.filter(from_user=user).order_by('?')
+
+def get_my_followers(user, count=None):
+    if settings.ACTIVITY_GET_MY_FOLLOWERS:
+        return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
+    else:
+        return ActivityFollower.objects.filter(to_user=user).order_by('?')
 
 
+def create_activity_item(type, user, subject, data=None, safetylevel=1):
+    type = ActivityTypes.objects.get(name=type)
+    if type.is_batchable:
+        # see if one exists in timeframe
+        batchable_items = ActivityStreamItem.objects.filter(actor=user, type=type).all()
+        if batchable_items: # if no batchable items then just create a ActivityStreamItem below
+            batchable_items[0].subjects.create(content_object=subject)
+            batchable_items[0].is_batched = True
+            batchable_items[0].save()
+            return batchable_items[0]
 
+    new_item = ActivityStreamItem.objects.create(actor=user, type=type, data=data, safetylevel=safetylevel)
+    new_item.subjects.create(content_object=subject)
+    new_item.save()
+
+    return new_item

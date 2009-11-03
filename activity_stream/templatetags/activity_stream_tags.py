@@ -1,5 +1,5 @@
 from django.template import Library, Node, TemplateSyntaxError, TemplateDoesNotExist
-from activity_stream.models import ActivityFollower, ActivityStreamItem
+from activity_stream.models import ActivityFollower, ActivityStreamItem, get_people_i_follow, get_my_followers
 from django.template import Variable, resolve_variable
 from django.template import loader
 from django.db.models import get_model
@@ -12,12 +12,12 @@ register = Library()
 
 @register.inclusion_tag("follower_list.html")
 def followed_by_him(user, count):
-    followed = ActivityFollower.objects.filter(from_user=user).order_by('?')[0:count]
+    followed = get_people_i_follow(user, count)
     return {"followed": followed}
 
 @register.inclusion_tag("following_list.html")
 def following_him(user, count):
-    fans = ActivityFollower.objects.filter(to_user=user).order_by('?')[0:count]
+    fans = get_my_followers(user, count)
     return {"following": fans}
 
 
@@ -28,8 +28,7 @@ def users_activity_stream(user, count):
 
 @register.inclusion_tag("friends_activity_stream.html")
 def following_activity_stream(user, count):
-    following =  user.following.values_list("id", flat=True)
-    following = [followed for followed in following]
+    following =  get_people_i_follow(user, 1000)
     following.append(user)
     activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False).order_by('-created_at')[0:count]
     return {"activity_items": activity_items}

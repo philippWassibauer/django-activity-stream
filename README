@@ -12,13 +12,27 @@ Activity Items can be commented and "liked". If you like an activity item of ano
 all your followers will see it too.
 
 
-To create different Types of Activities:
+To define different Types of Activities:
 ActivityTypes.objects.create(name="started_following", batch_time_minutes=30, is_batchable=True)
 
 
-To create an activity:
+To create an activity (when the user does something):
 from activity_stream.models import create_activity_item
-create_activity_item(type, user, subject, data=None, safetylevel=1, location=None)
+create_activity_item(type, user, subject, data=None, safetylevel=1)
+
+
+Integration into existing Networks:
+If you have preexisting networks like Friends, Contacts etc. you can define two functions in your settings file
+that the activity app will use to find the people you follow when your stream is rendered.
+
+ACTIVITY_GET_PEOPLE_I_FOLLOW = lambda user: get_people_i_follow(user)
+ACTIVITY_GET_MY_FOLLOWERS = lambda user: get_my_followers(user)
+
+
+Templates for Rendering:
+The app looks for the templates to render the stream in the following folder:
+templates/activity_stream/<activity_type>/full.html
+templates/activity_stream/<activity_type>/full_batched.html
 
 
 What is Batching?
@@ -33,7 +47,6 @@ batch_time_minutes=30
 
 so if repeat an action within 30 Minutes they will be one activity item with 2 Subjects, instead of 2 Activities with
 one Subject each.
-
 
 ================================================================
 This is still the Alpha version...improvements coming soon.
