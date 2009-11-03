@@ -52,7 +52,7 @@ def like(request, id):
     }, context_instance=RequestContext(request))
 
 
-def activity_stream(request, username, template_name="activitystream/activity_stream.html"):
+def activity_stream(request, username, template_name="activity_stream/activity_stream.html"):
     user = get_object_or_404(User, username=username)
     return render_to_response(template_name, {
         "viewed_user": user,
