@@ -52,7 +52,7 @@ class ActivityTypes(models.Model):
     def __unicode__(self):
         return self.name
 
-def create_activity_item(type, user, subject, data=None, safetylevel=1, location=None):
+def create_activity_item(type, user, subject, data=None, safetylevel=1):
     type = ActivityTypes.objects.get(name=type)
     if type.is_batchable:
         # see if one exists in timeframe
@@ -63,8 +63,7 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1, location
             batchable_items[0].save()
             return batchable_items[0]
 
-    new_item = ActivityStreamItem.objects.create(actor=user, type=type, data=data, safetylevel=safetylevel,
-                        location=location)
+    new_item = ActivityStreamItem.objects.create(actor=user, type=type, data=data, safetylevel=safetylevel)
     new_item.subjects.create(content_object=subject)
     new_item.save()
     
@@ -85,9 +84,6 @@ class ActivityStreamItem(models.Model):
 
     safetylevel = models.IntegerField(_('safetylevel'), choices=SAFETY_LEVELS, default=2, help_text=_('Who can see this?'))
     created_at      = models.DateTimeField(_('created at'), default=datetime.now)
-
-    location        = models.PointField(srid=4326, null=True, blank=True)
-    location_name = models.CharField(_('location name'), max_length=300, blank=True)
 
     is_batched = models.BooleanField(default=False)
     
