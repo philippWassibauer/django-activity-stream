@@ -1,0 +1,41 @@
+Django Activity Stream
+=======================
+
+This is a reusable Django application with which you can log activities your users are making
+and displaying a stream similar to the activity stream in facebook.
+
+Users can choose to Follow other Users activity Streams.
+
+Activity Items can have a safetylevel...so you can decide if they are public or just for friends.
+
+Activity Items can be commented and "liked". If you like an activity item of another user,
+all your followers will see it too.
+
+
+To create different Types of Activities:
+ActivityTypes.objects.create(name="started_following", batch_time_minutes=30, is_batchable=True)
+
+
+To create an activity:
+from activity_stream.models import create_activity_item
+create_activity_item(type, user, subject, data=None, safetylevel=1, location=None)
+
+
+What is Batching?
+Some actions happen a lot, eg.: placing images on a map (thats my case). So instead of displaying an activity item
+each and every time these actions can be batched by using:
+
+is_batchable=True
+
+furthermore you can set the batch time:
+
+batch_time_minutes=30
+
+so if repeat an action within 30 Minutes they will be one activity item with 2 Subjects, instead of 2 Activities with
+one Subject each.
+
+
+================================================================
+This is still the Alpha version...improvements coming soon.
+
+
