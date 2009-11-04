@@ -116,13 +116,13 @@ class ActivityStreamItemSubject(models.Model):
 
 
 def get_people_i_follow(user, count=None):
-    if settings.ACTIVITY_GET_PEOPLE_I_FOLLOW:
+    if hasattr(settings, "ACTIVITY_GET_PEOPLE_I_FOLLOW"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
         return ActivityFollower.objects.filter(from_user=user).order_by('?')
 
 def get_my_followers(user, count=None):
-    if settings.ACTIVITY_GET_MY_FOLLOWERS:
+    if hasattr(settings, "ACTIVITY_GET_MY_FOLLOWERS"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
         return ActivityFollower.objects.filter(to_user=user).order_by('?')
