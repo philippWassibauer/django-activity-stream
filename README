@@ -13,12 +13,17 @@ all your followers will see it too.
 
 
 To define different Types of Activities:
-ActivityTypes.objects.create(name="started_following", batch_time_minutes=30, is_batchable=True)
+ActivityTypes.objects.create(name="started_following", batch_time_minutes=30, is_batchable=True, is_batchable=True)
 
 
 To create an activity (when the user does something):
 from activity_stream.models import create_activity_item
-create_activity_item(type, user, subject, data=None, safetylevel=1)
+create_activity_item(type, user, subject, data=None, safetylevel=1, custom_date=None)
+
+* custom_date can be used to create activities now that wont display until a date in the future. This is useful when content can be created 
+  by the user that should not show up on the site until a certain time.
+* safetylevel is used to define if activities can only be seen by friends, or if they are public
+* data is a hashmap of extra context variables that can be used in the template rendering
 
 
 Integration into existing Networks:
@@ -47,6 +52,9 @@ batch_time_minutes=30
 
 so if repeat an action within 30 Minutes they will be one activity item with 2 Subjects, instead of 2 Activities with
 one Subject each.
+
+
+
 
 ================================================================
 This is still the Alpha version...improvements coming soon.

@@ -42,7 +42,8 @@ def end_follow(request, username, success_url=None):
     if not success_url:
         success_url = reverse("activity_stream", args=(user.username,))
     return HttpResponseRedirect(success_url)
-
+    
+@login_required
 def like(request, id):
     user = get_object_or_404(User, username=username)
     return render_to_response(template_name, {

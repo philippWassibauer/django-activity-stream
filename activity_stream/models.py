@@ -37,7 +37,7 @@ class SerializedDataField(models.TextField):
         if value is None: return
         return base64.b64encode(pickle.dumps(value))
 
-    
+
 class ActivityFollower(models.Model):
     to_user  = models.ForeignKey(User, related_name="followed")
     from_user  = models.ForeignKey(User, related_name="following")
@@ -128,7 +128,7 @@ def get_my_followers(user, count=None):
         return ActivityFollower.objects.filter(to_user=user).order_by('?')
 
 
-def create_activity_item(type, user, subject, data=None, safetylevel=1):
+def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_date=None):
     type = ActivityTypes.objects.get(name=type)
     if type.is_batchable:
         # see if one exists in timeframe
@@ -141,6 +141,14 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1):
 
     new_item = ActivityStreamItem.objects.create(actor=user, type=type, data=data, safetylevel=safetylevel)
     new_item.subjects.create(content_object=subject)
+    
+    if custom_date:
+        new_item.created_at = custom_date
+        
     new_item.save()
 
     return new_item
+
+
+class TestSubject(models.Model):
+    test = models.BooleanField(default=False)
