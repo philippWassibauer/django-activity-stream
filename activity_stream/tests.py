@@ -17,27 +17,43 @@ class StoryTest(TestCase):
         User.objects.get_or_create(username="admin", email="sfd@sdf.com")
         ActivityTypes.objects.create(name="placed", is_batchable=True)
         ActivityTypes.objects.create(name="placed2")
-        
+
+    def test_cascaded_delete(self):
+        c = Client()
+        c.login(username='admin', password='localhost')
+        photo = TestSubject.objects.create(test=True)
+        photo2 = TestSubject.objects.create(test=True)
+        activityItem = create_activity_item("placed", User.objects.get(username="admin"), photo)
+        activityItem.delete()
+        self.assertTrue(TestSubject.objects.get(pk=photo.id))
+
+        activityItem2 = create_activity_item("placed", User.objects.get(username="admin"), photo2)
+        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        self.assertEquals(len(items['activity_items']), 1)
+
+        photo2.delete()
+
+        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        self.assertEquals(len(items['activity_items']), 0)
+
     def test_batching(self):
         c = Client()
         c.login(username='admin', password='localhost')
         photo = TestSubject.objects.create(test=True)
+        photo2 = TestSubject.objects.create(test=True)
         photo.save()
-        activityItem = create_activity_item("placed", User.objects.get(username="admin"), photo)
-        self.assertTrue(activityItem)
-        self.assertEquals(activityItem.is_batched, False)
-        self.assertEquals(activityItem.subjects.count(), 1)
+        activityItem1 = create_activity_item("placed", User.objects.get(username="admin"), photo)
+        self.assertTrue(activityItem1)
+        self.assertEquals(activityItem1.is_batched, False)
+        self.assertEquals(activityItem1.subjects.count(), 1)
 
-        activityItem2 = create_activity_item("placed", User.objects.get(username="admin"), photo)
+        activityItem2 = create_activity_item("placed", User.objects.get(username="admin"), photo2)
         self.assertTrue(activityItem2)
         self.assertEquals(activityItem2.is_batched, True)
         self.assertEquals(activityItem2.subjects.count(), 2)
 
-        items = users_activity_stream(User.objects.get(username="admin"),1000)
-        self.assertEquals(len(items['activity_items']), 1)
-
-        activityItem.delete()
-        activityItem2.delete()
+        #activityItem2.delete()
+        #activityItem2.delete()
 
 
     def test_future_activities(self):

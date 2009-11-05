@@ -111,8 +111,16 @@ class ActivityStreamItemSubject(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
     activity_stream_item = models.ForeignKey(ActivityStreamItem, related_name="subjects")
+
     def __unicode__(self):
         return "%s %s"%(self.content_type, self.object_id)
+
+
+from django.db.models.signals import post_save, post_delete
+def delete_activity_on_subject_delete(sender, instance, **kwargs):
+    if instance.activity_stream_item.subjects.count()<1:
+        instance.activity_stream_item.delete()
+post_delete.connect(delete_activity_on_subject_delete, sender=ActivityStreamItemSubject)
 
 
 def get_people_i_follow(user, count=None):
@@ -145,10 +153,12 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_d
     if custom_date:
         new_item.created_at = custom_date
         
-    new_item.save()
+    new_item.save()                   
 
     return new_item
 
-
+    
+from django.contrib.contenttypes import generic
 class TestSubject(models.Model):
     test = models.BooleanField(default=False)
+    activity = generic.GenericRelation(ActivityStreamItemSubject)
