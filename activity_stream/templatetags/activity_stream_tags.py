@@ -22,14 +22,14 @@ def following_him(user, count):
 
 @register.inclusion_tag("user_activity_stream.html")
 def users_activity_stream(user, count):
-    activity_items = ActivityStreamItem.objects.filter(actor=user, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at')[0:count]
+    activity_items = ActivityStreamItem.objects.filter(actor=user, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
     return {"activity_items": activity_items}
 
 @register.inclusion_tag("friends_activity_stream.html")
 def following_activity_stream(user, count):
     following =  get_people_i_follow(user, 1000)
     following.append(user)
-    activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at')[0:count]
+    activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
     return {"activity_items": activity_items}
 
 

@@ -33,6 +33,12 @@ class StoryTest(TestCase):
         self.assertEquals(activityItem2.is_batched, True)
         self.assertEquals(activityItem2.subjects.count(), 2)
 
+        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        self.assertEquals(len(items['activity_items']), 1)
+
+        activityItem.delete()
+        activityItem2.delete()
+
 
     def test_future_activities(self):
         c = Client()
@@ -46,5 +52,6 @@ class StoryTest(TestCase):
         self.assertEquals(activityItem.subjects.count(), 1)
         items = users_activity_stream(User.objects.get(username="admin"),1000)
         self.assertEquals(len(items['activity_items']), 0)
+        activityItem.delete()
 
 
