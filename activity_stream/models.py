@@ -127,13 +127,13 @@ def get_people_i_follow(user, count=None):
     if hasattr(settings, "ACTIVITY_GET_PEOPLE_I_FOLLOW"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
-        return ActivityFollower.objects.filter(from_user=user).order_by('?')
+        return ActivityFollower.objects.filter(from_user=user).order_by('?').all()
 
 def get_my_followers(user, count=None):
     if hasattr(settings, "ACTIVITY_GET_MY_FOLLOWERS"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
-        return ActivityFollower.objects.filter(to_user=user).order_by('?')
+        return ActivityFollower.objects.filter(to_user=user).order_by('?').all()
 
 
 def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_date=None):
