@@ -10,7 +10,7 @@ setup(
     url='http://github.com/philippWassibauer/django-activity-stream',
     download_url='http://github.com/philippWassibauer/django-activity-stream/tarball/master',
     license='MIT',
-    version = "0.1",
+    version = __import__('activity_stream').__version__,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
