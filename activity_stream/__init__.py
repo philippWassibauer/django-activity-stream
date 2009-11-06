@@ -1,4 +1,4 @@
-VERSION = (0, 2, 2)
+VERSION = (0, 2, 3)
 
 def get_version():
     return "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
