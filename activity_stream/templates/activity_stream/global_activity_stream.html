@@ -1,12 +1,14 @@
-{% load 
+{% load pagination_tags %}
 {% if activity_items %}
+    {% autopaginate activity_items count %}
     <ul class="activity-stream">
         {% for activity_item in activity_items %}
             <li>
-                {{activity_item.render}} 
+                {{activity_item.render}}
             </li>
         {% endfor %}
     </ul>
+      {% paginate %}
 {% else %}
         <b>No activity</b>
 {% endif %}
