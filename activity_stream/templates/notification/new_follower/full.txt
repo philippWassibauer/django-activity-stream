@@ -1,0 +1,3 @@
+{{follower}} is following you now.
+
+http://{{CURRENT_SITE}}{% url activity_stream follower %}

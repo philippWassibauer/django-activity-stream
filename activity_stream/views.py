@@ -14,6 +14,10 @@ from blog.models import Post,PostImage
 from blog.forms import BlogForm, BlogImageForm
 
 import datetime
+try:
+    from notification import models as notification
+except ImportError:
+    notification = None
 
 def activity_stream_item(request, username, id, template_name="activity_stream/activity_item.html"):
     return render_to_response(template_name, {
@@ -31,7 +35,11 @@ def start_follow(request, username, success_url=None):
     create_activity_item("started_following", request.user, user)
 
     if not success_url:
-        success_url = reverse("profile_detail", args=(user.username,))
+        success_url = request.META.get('HTTP_REFERER','/')
+       
+    if notification:
+        notification.send([user], "new_follower", {"follower": request.user})
+        
     return HttpResponseRedirect(success_url)
 
 @login_required
