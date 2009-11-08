@@ -28,7 +28,8 @@ def users_activity_stream(user, count):
 @register.inclusion_tag("activity_stream/friends_activity_stream.html")
 def following_activity_stream(user, count):
     following =  get_people_i_follow(user, 1000)
-    list(following).append(user)   
+    following = list(following)
+    following.append(user)   
     activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
     return {"activity_items": activity_items}
 
