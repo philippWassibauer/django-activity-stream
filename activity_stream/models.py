@@ -123,18 +123,18 @@ def delete_activity_on_subject_delete(sender, instance, **kwargs):
 post_delete.connect(delete_activity_on_subject_delete, sender=ActivityStreamItemSubject)
 
 
-def get_people_i_follow(user, count=None):
+def get_people_i_follow(user, count=20, offset=0):
     if hasattr(settings, "ACTIVITY_GET_PEOPLE_I_FOLLOW"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
-        followers =  ActivityFollower.objects.filter(from_user=user).order_by('?').all()
+        followers =  ActivityFollower.objects.filter(from_user=user)[offset, count]
         return [follower.to_user for follower in followers]
 
-def get_my_followers(user, count=None):
+def get_my_followers(user, count=20, offset=0):
     if hasattr(settings, "ACTIVITY_GET_MY_FOLLOWERS"):
         return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
     else:
-        followers = ActivityFollower.objects.filter(to_user=user).order_by('?').all()
+        followers = ActivityFollower.objects.filter(to_user=user)[offset, count]
         return [follower.from_user for follower in followers]
 
 
