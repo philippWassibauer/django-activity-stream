@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import date_based
 from django.conf import settings
-from activity_stream.models import ActivityFollower, create_activity_item
+from activity_stream.models import ActivityFollower, create_activity_item, ActivityStreamItem
 from blog.models import Post,PostImage
 from blog.forms import BlogForm, BlogImageForm
 
@@ -20,10 +20,11 @@ except ImportError:
     notification = None
 
 def activity_stream_item(request, username, id, template_name="activity_stream/activity_item.html"):
+    user = get_object_or_404(User, username=username)
+    activity_item = get_object_or_404(ActivityStreamItem, pk=id)
     return render_to_response(template_name, {
-        "search_terms": search_terms,
-        "featured_post": featured_post,
-        "blogposts": blogposts,
+        "activity_item": activity_item,
+        "viewed_user": user,
     }, context_instance=RequestContext(request))
 
 @login_required
