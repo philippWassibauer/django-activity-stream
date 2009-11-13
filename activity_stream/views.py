@@ -54,12 +54,9 @@ def end_follow(request, username, success_url=None):
     
 @login_required
 def like(request, id):
-    user = get_object_or_404(User, username=username)
-    return render_to_response(template_name, {
-        "search_terms": search_terms,
-        "featured_post": featured_post,
-        "blogposts": blogposts,
-    }, context_instance=RequestContext(request))
+    subject = get_object_or_404(ActivityStreamItem, pk=id)
+    create_activity_item("like", request.user, subject)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 
 def activity_stream(request, username, template_name="activity_stream/activity_stream.html"):
