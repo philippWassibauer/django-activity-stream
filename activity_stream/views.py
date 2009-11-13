@@ -55,7 +55,7 @@ def end_follow(request, username, success_url=None):
 @login_required
 def like(request, id):
     subject = get_object_or_404(ActivityStreamItem, pk=id)
-    create_activity_item("like", request.user, subject)
+    create_activity_item("likes", request.user, subject)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 
