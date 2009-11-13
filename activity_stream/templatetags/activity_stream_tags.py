@@ -47,11 +47,17 @@ class IsFollowingNode(Node):
         self.node_false = node_false
         
     def render(self, context):
-        is_following = ActivityFollower.objects.filter(to_user=self.to_user.resolve(context), from_user=self.from_user.resolve(context))[:1]
-        if is_following:
-            return self.node_true.render(context)
-        else:
-            return self.node_false.render(context)
+        to_user = self.to_user.resolve(context)
+        from_user = self.from_user.resolve(context)
+        if to_user and from_user:
+            if to_user.is_authenticated() and from_user.is_authenticated():
+                is_following = ActivityFollower.objects.filter(to_user=to_user, from_user=from_user).count()
+                if is_following:
+                    return self.node_true.render(context)
+                else:
+                    return self.node_false.render(context)
+            else:
+                return self.node_false.render(context)
 
 def is_following(parser, token):
     bits = token.split_contents()[1:]
