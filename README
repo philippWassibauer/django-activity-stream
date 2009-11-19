@@ -53,8 +53,11 @@ batch_time_minutes=30
 so if repeat an action within 30 Minutes they will be one activity item with 2 Subjects, instead of 2 Activities with
 one Subject each.
 
-
-
+TODO:
+Comments don't work yet
+Blocking people in your news stream
+filter for only certain activities
+realtime update for activities ... like foursquare
 
 ================================================================
 This is still the Alpha version...improvements coming soon.
