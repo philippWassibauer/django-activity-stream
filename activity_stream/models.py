@@ -145,7 +145,14 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_d
     type = ActivityTypes.objects.get(name=type)
     if type.is_batchable:
         # see if one exists in timeframe
-        cutoff_time = datetime.now()-timedelta(minutes=type.batch_time_minutes)
+        batch_minutes = type.batch_time_minutes
+        if not batch_minutes:
+            if hasattr(settings, "ACTIVITY_DEFAULT_BATCH_TIME"):
+                batch_minutes = settings.ACTIVITY_DEFAULT_BATCH_TIME
+            else:
+                batch_minutes = 30
+
+        cutoff_time = datetime.now()-timedelta(minutes=batch_minutes)
         batchable_items = ActivityStreamItem.objects.filter(actor=user, type=type,
                   created_at__gt=cutoff_time).order_by('-created_at').all()[0:1]
         if batchable_items: # if no batchable items then just create a ActivityStreamItem below
