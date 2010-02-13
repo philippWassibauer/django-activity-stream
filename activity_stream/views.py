@@ -10,8 +10,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import date_based
 from django.conf import settings
 from activity_stream.models import ActivityFollower, create_activity_item, ActivityStreamItem
-from blog.models import Post,PostImage
-from blog.forms import BlogForm, BlogImageForm
 
 import datetime
 try:
