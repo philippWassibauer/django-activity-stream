@@ -17,7 +17,8 @@ try:
 except ImportError:
     notification = None
 
-def activity_stream_item(request, username, id, template_name="activity_stream/activity_item.html"):
+def activity_stream_item(request, username, id,
+                         template_name="activity_stream/activity_item.html"):
     user = get_object_or_404(User, username=username)
     activity_item = get_object_or_404(ActivityStreamItem, pk=id)
     return render_to_response(template_name, {
@@ -50,6 +51,7 @@ def end_follow(request, username, success_url=None):
         success_url = reverse("activity_stream", args=(user.username,))
     return HttpResponseRedirect(success_url)
     
+    
 @login_required
 def like(request, id):
     subject = get_object_or_404(ActivityStreamItem, pk=id)
@@ -61,5 +63,24 @@ def activity_stream(request, username, template_name="activity_stream/activity_s
     user = get_object_or_404(User, username=username)
     return render_to_response(template_name, {
         "viewed_user": user,
+        "count": request.GET.get("count", None),
+        "offset": request.GET.get("offset", None),
     }, context_instance=RequestContext(request))
+
+
+def global_stream(request, template_name="activity_stream/global_activity_stream.html"):
+    return render_to_response(template_name, {
+        "count": request.GET.get("count", None),
+        "offset": request.GET.get("offset", None),
+    }, context_instance=RequestContext(request))
+    
+    
+def following_stream(request, username, template_name="activity_stream/following_stream.html"):
+    user = get_object_or_404(User, username=username)
+    return render_to_response(template_name, {
+        "viewed_user": user,
+        "count": request.GET.get("count", None),
+        "offset": request.GET.get("offset", None),
+    }, context_instance=RequestContext(request))
+
 

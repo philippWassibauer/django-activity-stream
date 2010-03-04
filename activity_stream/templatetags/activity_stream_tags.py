@@ -21,25 +21,50 @@ def following_him(user, count):
 
 
 @register.inclusion_tag("activity_stream/user_activity_stream.html")
-def users_activity_stream(user, count):
-    activity_items = ActivityStreamItem.objects.filter(actor=user, 
+def users_activity_stream(user, count, offset=0):
+	
+	if not count:
+		count = 20
+		
+	if not offset:
+		offset=0
+		
+	activity_items = ActivityStreamItem.objects.filter(actor=user, 
 						       subjects__isnull=False, 
-						       created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
-    return {"activity_items": activity_items}
+						       created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
+	return {"activity_items": activity_items}
+
 
 @register.inclusion_tag("activity_stream/friends_activity_stream.html")
-def following_activity_stream(user, count):
-    following =  get_people_i_follow(user, 1000)
-    following = list(following)
-    following.append(user)   
-    activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
-    return {"activity_items": activity_items}
+def following_activity_stream(user, count, offset=0):
+	
+	if not count:
+		count = 20
+		
+	if not offset:
+		offset=0
+		
+	following =  get_people_i_follow(user, 1000)
+	following = list(following)
+	following.append(user)   
+	activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
+	return {"activity_items": activity_items}
 
 
 @register.inclusion_tag("activity_stream/global_activity_stream.html")
-def global_activity_stream(count, privacylevel=0):
-    activity_items = ActivityStreamItem.objects.filter(subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[0:count]
-    return {"activity_items": activity_items}
+def global_activity_stream(count, offset=0, privacylevel=0):
+	
+	if not count:
+		count = 20
+		
+	if not offset:
+		offset=0
+		
+	activity_items = ActivityStreamItem.objects.filter(subjects__isnull=False,
+						created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
+	
+	return {"activity_items": activity_items}
+
 
 class IsFollowingNode(Node):
     def __init__(self, from_user, to_user, node_true, node_false):
