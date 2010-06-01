@@ -152,7 +152,7 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_d
         # see if one exists in timeframe
         batch_minutes = type.batch_time_minutes
         if not batch_minutes:
-            batch_minutes = settings.ACTIVITY_DEFAULT_BATCH_TIME
+            batch_minutes = ACTIVITY_DEFAULT_BATCH_TIME
 
         cutoff_time = datetime.now()-timedelta(minutes=batch_minutes)
         batchable_items = ActivityStreamItem.objects.filter(actor=user, type=type,
@@ -169,8 +169,7 @@ def create_activity_item(type, user, subject, data=None, safetylevel=1, custom_d
     
     if custom_date:
         new_item.created_at = custom_date
-        
-    new_item.save() 
+        new_item.save() 
     return new_item
 
     
