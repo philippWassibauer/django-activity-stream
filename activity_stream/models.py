@@ -140,7 +140,7 @@ def get_people_i_follow(user, count=20, offset=0):
 
 def get_my_followers(user, count=20, offset=0):
     if hasattr(settings, "ACTIVITY_GET_MY_FOLLOWERS"):
-        return settings.ACTIVITY_GET_PEOPLE_I_FOLLOW(user)
+        return settings.ACTIVITY_GET_MY_FOLLOWERS(user)
     else:
         followers = ActivityFollower.objects.filter(to_user=user).all()[offset:count]
         return [follower.from_user for follower in followers]
