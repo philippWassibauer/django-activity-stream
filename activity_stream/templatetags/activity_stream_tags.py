@@ -9,16 +9,17 @@ import datetime
 
 register = Library()
 
-@register.inclusion_tag("activity_stream/follower_list.html")
-def followed_by_him(user, count):
+
+@register.inclusion_tag("activity_stream/follower_list.html", takes_context=True)
+def followed_by_him(context, user, count):
     followed = get_people_i_follow(user, count)
-    return {"followed": followed}
+    return {"followed": followed, "request":context.get("request")}
 
 
-@register.inclusion_tag("activity_stream/following_list.html")
-def following_him(user, count):
+@register.inclusion_tag("activity_stream/following_list.html", takes_context=True)
+def following_him(context, user, count):
     fans = get_my_followers(user, count)
-    return {"following": fans}
+    return {"following": fans, "request":context.get("request")}
 
 
 @register.inclusion_tag("activity_stream/user_activity_stream.html", takes_context=True)
@@ -31,7 +32,8 @@ def users_activity_stream(context, user, count, offset=0):
 	activity_items = ActivityStreamItem.objects.filter(actor=user, 
 						       subjects__isnull=False, 
 						       created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
-	return {"activity_items": activity_items, "user": context["user"], "request":context["request"]}
+	return {"activity_items": activity_items, "user": context["user"],
+		"request":context.get("request")}
 
 
 @register.inclusion_tag("activity_stream/friends_activity_stream.html", takes_context=True)
@@ -47,7 +49,8 @@ def following_activity_stream(context, user, count, offset=0):
 	following = list(following)
 	following.append(user)   
 	activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
-	return {"activity_items": activity_items, "user": context["user"], "request":context["request"]}
+	return {"activity_items": activity_items, "user": context["user"],
+		"request":context.get("request")}
 
 
 @register.inclusion_tag("activity_stream/global_activity_stream.html", takes_context=True)
@@ -62,7 +65,27 @@ def global_activity_stream(context, count, offset=0, privacylevel=0):
 	activity_items = ActivityStreamItem.objects.filter(subjects__isnull=False,
 						created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
 	
-	return {"activity_items": activity_items, "user": context["user"], "request":context["request"]}
+	return {"activity_items": activity_items, "user": context["user"],
+		"request":context.get("request")}
+
+
+class RenderActivityNode(Node):
+    def __init__(self, activity):
+        self.activity = activity
+        print self.activity
+    
+    def render(self, context):
+        activity = context[self.activity]
+        return activity.render(context)
+
+def render_activity(parser, token):
+    try:
+        tag_name, format_string = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
+    return RenderActivityNode(format_string)
+
+register.tag('render_activity', render_activity)
 
 
 class IsFollowingNode(Node):

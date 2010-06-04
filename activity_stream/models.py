@@ -90,12 +90,13 @@ class ActivityStreamItem(models.Model):
             'id': self.id
     })
 
-    def render(self):
+    def render(self, context):
         from django.template.loader import get_template
         from django.template import Template
         from django.template import Context
         t = get_template('activity_stream/%s/full%s.html'%(self.type.name,self.get_batch_suffix()))
-        html = t.render(Context({'activity_item': self}))
+        html = t.render(Context({'activity_item': self,
+                'request': context.get('request')}))
         return html
     get_absolute_url = models.permalink(get_absolute_url)
     
