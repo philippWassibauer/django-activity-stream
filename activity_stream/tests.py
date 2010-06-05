@@ -42,12 +42,16 @@ class StoryTest(TestCase):
         photo = TestSubject.objects.create(test=True)
         photo2 = TestSubject.objects.create(test=True)
         photo.save()
-        activityItem1 = create_activity_item("placed", User.objects.get(username="admin"), photo)
+        activityItem1 = create_activity_item("placed", \
+                                             User.objects.get(username="admin"),\
+                                             photo)
         self.assertTrue(activityItem1)
         self.assertEquals(activityItem1.is_batched, False)
         self.assertEquals(activityItem1.subjects.count(), 1)
 
-        activityItem2 = create_activity_item("placed", User.objects.get(username="admin"), photo2)
+        activityItem2 = create_activity_item("placed", \
+                                             User.objects.get(username="admin"), \
+                                            photo2)
         self.assertTrue(activityItem2)
         self.assertEquals(activityItem2.is_batched, True)
         self.assertEquals(activityItem2.subjects.count(), 2)
@@ -62,7 +66,9 @@ class StoryTest(TestCase):
         photo = TestSubject.objects.create(test=False)
         photo.save()
         custom_date = datetime.date.today() + datetime.timedelta(3)
-        activityItem = create_activity_item("placed2", User.objects.get(username="admin"), photo, custom_date=custom_date)
+        activityItem = create_activity_item("placed2",\
+                                            User.objects.get(username="admin"),\
+                                            photo, custom_date=custom_date)
         self.assertTrue(activityItem)
         self.assertEquals(activityItem.is_batched, False)
         self.assertEquals(activityItem.subjects.count(), 1)

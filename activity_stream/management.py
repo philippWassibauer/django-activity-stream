@@ -16,7 +16,7 @@ def create_activity_types(app, created_models, verbosity, **kwargs):
 
     try:
         ActivityTypes.objects.get_or_create(name="started_following", batch_time_minutes=30, is_batchable=True)
-	ActivityTypes.objects.get_or_create(name="likes", is_batchable=False)
+        ActivityTypes.objects.get_or_create(name="likes", is_batchable=False)
     except:
         pass
     

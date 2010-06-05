@@ -35,7 +35,7 @@ def users_activity_stream(context, user, count, offset=0):
 						.order_by('-created_at').distinct()[offset:count]
 	
 	return {"activity_items": activity_items,
-			"user": context["user"],
+			"user": context.get("user"),
 			"request":context.get("request")
 			}
 
@@ -56,7 +56,7 @@ def following_activity_stream(context, user, count, offset=0):
 													   subjects__isnull=False, \
 													   created_at__lte=datetime.datetime.now())\
 												.order_by('-created_at').distinct()[offset:count]
-	return {"activity_items": activity_items, "user": context["user"],
+	return {"activity_items": activity_items, "user": context.get("user"),
 		"request":context.get("request")}
 
 
@@ -73,7 +73,7 @@ def global_activity_stream(context, count, offset=0, privacylevel=0):
 										created_at__lte=datetime.datetime.now())\
 								.order_by('-created_at').distinct()[offset:count]
 	
-	return {"activity_items": activity_items, "user": context["user"],
+	return {"activity_items": activity_items, "user": context.get("user"),
 		"request":context.get("request")}
 
 
