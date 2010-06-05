@@ -28,12 +28,12 @@ class StoryTest(TestCase):
         self.assertTrue(TestSubject.objects.get(pk=photo.id))
 
         activityItem2 = create_activity_item("placed", User.objects.get(username="admin"), photo2)
-        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        items = users_activity_stream({}, User.objects.get(username="admin"),1000)
         self.assertEquals(len(items['activity_items']), 1)
 
         photo2.delete()
 
-        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        items = users_activity_stream({}, User.objects.get(username="admin"),1000)
         self.assertEquals(len(items['activity_items']), 0)
 
     def test_batching(self):
@@ -66,7 +66,7 @@ class StoryTest(TestCase):
         self.assertTrue(activityItem)
         self.assertEquals(activityItem.is_batched, False)
         self.assertEquals(activityItem.subjects.count(), 1)
-        items = users_activity_stream(User.objects.get(username="admin"),1000)
+        items = users_activity_stream({}, User.objects.get(username="admin"),1000)
         self.assertEquals(len(items['activity_items']), 0)
         activityItem.delete()
 

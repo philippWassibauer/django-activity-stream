@@ -31,9 +31,13 @@ def users_activity_stream(context, user, count, offset=0):
 		offset=0
 	activity_items = ActivityStreamItem.objects.filter(actor=user, 
 						       subjects__isnull=False, 
-						       created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
-	return {"activity_items": activity_items, "user": context["user"],
-		"request":context.get("request")}
+						       created_at__lte=datetime.datetime.now())\
+						.order_by('-created_at').distinct()[offset:count]
+	
+	return {"activity_items": activity_items,
+			"user": context["user"],
+			"request":context.get("request")
+			}
 
 
 @register.inclusion_tag("activity_stream/friends_activity_stream.html", takes_context=True)
@@ -48,7 +52,10 @@ def following_activity_stream(context, user, count, offset=0):
 	following =  get_people_i_follow(user, 1000)
 	following = list(following)
 	following.append(user)   
-	activity_items = ActivityStreamItem.objects.filter(actor__in=following, subjects__isnull=False, created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
+	activity_items = ActivityStreamItem.objects.filter(actor__in=following, \
+													   subjects__isnull=False, \
+													   created_at__lte=datetime.datetime.now())\
+												.order_by('-created_at').distinct()[offset:count]
 	return {"activity_items": activity_items, "user": context["user"],
 		"request":context.get("request")}
 
@@ -63,7 +70,8 @@ def global_activity_stream(context, count, offset=0, privacylevel=0):
 		offset=0
 		
 	activity_items = ActivityStreamItem.objects.filter(subjects__isnull=False,
-						created_at__lte=datetime.datetime.now()).order_by('-created_at').distinct()[offset:count]
+										created_at__lte=datetime.datetime.now())\
+								.order_by('-created_at').distinct()[offset:count]
 	
 	return {"activity_items": activity_items, "user": context["user"],
 		"request":context.get("request")}
@@ -100,7 +108,7 @@ class IsFollowingNode(Node):
         from_user = self.from_user.resolve(context)
         if to_user and from_user:
             if to_user.is_authenticated() and from_user.is_authenticated():
-                is_following = ActivityFollower.objects.filter(to_user=to_user, from_user=from_user).count()
+                is_following = ActivityFollower.objects.filter(to_user=to_user,from_user=from_user).count()
                 if is_following:
                     return self.node_true.render(context)
                 else:
