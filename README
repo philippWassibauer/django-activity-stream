@@ -1,6 +1,8 @@
 Django Activity Stream
 =======================
 
+FYI: there is a second django-activity-stream. Some people have been telling me that it is simpler to use, has less joins etc. I don't have time to double check that, so see for yourself: http://github.com/justquick/django-activity-stream .
+
 This is a reusable Django application with which you can log activities your users are making
 and displaying a stream similar to the activity stream in facebook.
 
